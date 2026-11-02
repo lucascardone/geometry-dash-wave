@@ -1,5 +1,6 @@
 const { execFile } = require("child_process");
 const { EventEmitter } = require("events");
+const { hostEnv, hostCommand } = require("./host");
 
 const POLL_MS = 2000;
 
@@ -32,13 +33,14 @@ class SpotifyWatcher extends EventEmitter {
   }
 
   _poll() {
-    execFile("gdbus", [
+    const [cmd, args] = hostCommand("gdbus", [
       "call", "--session",
       "--dest", "org.mpris.MediaPlayer2.spotify",
       "--object-path", "/org/mpris/MediaPlayer2",
       "--method", "org.freedesktop.DBus.Properties.GetAll",
       "org.mpris.MediaPlayer2.Player",
-    ], { timeout: 1500 }, (err, stdout) => {
+    ]);
+    execFile(cmd, args, { timeout: 1500, env: hostEnv() }, (err, stdout) => {
       let track = null;
       if (!err) {
         track = {

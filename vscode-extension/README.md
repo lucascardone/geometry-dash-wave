@@ -18,7 +18,7 @@ En Windows y macOS no está probada: la captura automática de audio es solo par
 
 ### Opción 1: desde el `.vsix` (la más fácil)
 
-1. Descargá el archivo `wave-gd-X.Y.Z.vsix` de la sección [**Releases**](https://github.com/<tu-usuario>/wave-gd/releases) del repo.
+1. Descargá el archivo `wave-gd-X.Y.Z.vsix` de la sección [**Releases**](https://github.com/lucascardone/geometry-dash-wave/releases) del repo.
 2. Instalalo de una de estas dos formas:
    - **Desde VS Code:** abrí la vista de Extensiones (`Ctrl+Shift+X`), tocá el menú `···` de arriba → **Install from VSIX...** y elegí el archivo.
    - **Desde la terminal:**
@@ -32,8 +32,8 @@ En Windows y macOS no está probada: la captura automática de audio es solo par
 Necesitás [Node.js](https://nodejs.org) 18 o más nuevo y `git`.
 
 ```bash
-git clone https://github.com/<tu-usuario>/wave-gd.git
-cd wave-gd/vscode-extension
+git clone https://github.com/lucascardone/geometry-dash-wave.git
+cd geometry-dash-wave/vscode-extension
 npx --yes @vscode/vsce package --allow-missing-repository
 code --install-extension wave-gd-0.1.0.vsix --force
 ```
@@ -93,6 +93,17 @@ Fijate si tenés `pw-record` o `parec`:
 command -v pw-record parec
 ```
 Si no aparece ninguno, instalá `pipewire-bin` (PipeWire) o `pulseaudio-utils` (PulseAudio), según tu distro. Después corré **Wave GD: Reiniciar captura de audio**.
+
+**Tengo VS Code instalado por Snap o Flatpak.**
+La extensión funciona igual, pero la música depende de poder correr programas del sistema (`pw-record`, `parec`, `gdbus`):
+- **Snap:** VS Code mete variables de entorno propias que rompen esos programas. La extensión las limpia antes de lanzarlos, así que no hace falta hacer nada.
+- **Flatpak:** VS Code corre en un sandbox que no ve los programas del sistema, así que la extensión los lanza afuera con `flatpak-spawn --host`. Si igual no anda, dale permiso y reiniciá VS Code:
+  ```bash
+  flatpak override --user --talk-name=org.freedesktop.Flatpak com.visualstudio.code
+  ```
+- Si querés evitar estos problemas, usá el `.deb` / `.rpm` oficial de [code.visualstudio.com](https://code.visualstudio.com).
+
+Si algo falla, el panel muestra el error abajo con un ⚠, y entre paréntesis te dice si VS Code está corriendo en Snap o Flatpak.
 
 **Detecta pocos o demasiados beats.**
 Bajá o subí `waveGd.sensitivity`.

@@ -1,5 +1,6 @@
 const { spawn, spawnSync } = require("child_process");
 const { EventEmitter } = require("events");
+const { hostEnv, hostCommand, sandboxName } = require("./host");
 
 // ─── Config de análisis (equivalente al AnalyserNode del prototipo) ───
 const SAMPLE_RATE = 22050;
@@ -28,7 +29,8 @@ const LOUD_SHORT = 1 - 1 / (FPS * 1.5); // EMA ~1.5s
 const LOUD_LONG = 1 - 1 / (FPS * 20);   // EMA ~20s
 
 function hasCommand(cmd) {
-  return spawnSync("sh", ["-c", `command -v ${cmd}`]).status === 0;
+  const [c, a] = hostCommand("sh", ["-c", `command -v ${cmd}`]);
+  return spawnSync(c, a, { env: hostEnv(), timeout: 3000 }).status === 0;
 }
 
 function defaultCommand() {
@@ -131,16 +133,19 @@ class AudioCapture extends EventEmitter {
     if (this.proc) return;
     let cmd;
     if (customCommand && customCommand.trim()) {
-      cmd = ["sh", ["-c", customCommand]];
+      cmd = hostCommand("sh", ["-c", customCommand]);
     } else {
       cmd = defaultCommand();
+      if (cmd) cmd = hostCommand(cmd[0], cmd[1]);
     }
     if (!cmd) {
-      this.emit("status", { ok: false, message: "No encontré pw-record ni parec para capturar audio" });
+      const sb = sandboxName();
+      this.emit("status", { ok: false, message: "No encontré pw-record ni parec para capturar audio" +
+        (sb ? ` (VS Code corre en ${sb})` : "") });
       return;
     }
 
-    const proc = spawn(cmd[0], cmd[1], { stdio: ["ignore", "pipe", "pipe"] });
+    const proc = spawn(cmd[0], cmd[1], { stdio: ["ignore", "pipe", "pipe"], env: hostEnv() });
     this.proc = proc;
     let stderr = "";
     proc.stdout.on("data", (buf) => this._onData(buf));
@@ -156,7 +161,7 @@ class AudioCapture extends EventEmitter {
         }
       }
     });
-    this.emit("status", { ok: true, message: `Capturando audio del sistema (${cmd[0]})` });
+    this.emit("status", { ok: true, message: `Capturando audio del sistema (${cmd[1][0] === "--host" ? cmd[1][1] : cmd[0]})` });
   }
 
   stop() {
