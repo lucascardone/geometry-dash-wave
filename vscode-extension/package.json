@@ -1,0 +1,76 @@
+{
+  "name": "wave-gd",
+  "displayName": "Wave GD",
+  "description": "Un wave estilo Geometry Dash en VS Code que se mueve al ritmo de la música (Spotify) o con tu mouse/teclado.",
+  "version": "0.1.0",
+  "publisher": "lcardone",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "waveGd.view",
+          "name": "Wave"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "waveGd.show",
+        "title": "Wave GD: Mostrar"
+      },
+      {
+        "command": "waveGd.restartAudio",
+        "title": "Wave GD: Reiniciar captura de audio"
+      },
+      {
+        "command": "waveGd.resetHighscore",
+        "title": "Wave GD: Borrar récord"
+      }
+    ],
+    "configuration": {
+      "title": "Wave GD",
+      "properties": {
+        "waveGd.idleTimeout": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "description": "Segundos sin tocar el wave antes de pasar a modo automático."
+        },
+        "waveGd.sensitivity": {
+          "type": "number",
+          "default": 1.5,
+          "minimum": 0.5,
+          "maximum": 4,
+          "description": "Umbral de detección de beats, en desvíos estándar sobre el promedio del último segundo (más bajo = más beats)."
+        },
+        "waveGd.speed": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.25,
+          "maximum": 3,
+          "description": "Multiplicador de velocidad del wave."
+        },
+        "waveGd.color": {
+          "type": "string",
+          "default": "#00e6ff",
+          "description": "Color principal del wave y la estela (hex)."
+        },
+        "waveGd.audioCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Comando propio para capturar audio (debe sacar PCM s16le mono 22050 Hz por stdout). Vacío = automático (pw-record o parec)."
+        }
+      }
+    }
+  }
+}
